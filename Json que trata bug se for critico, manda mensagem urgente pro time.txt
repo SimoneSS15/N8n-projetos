@@ -1,0 +1,82 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "path": "webhook-bug-qa",
+        "options": {}
+      },
+      "id": "ececd11a-904f-4232-afe7-80ec8b2152a2",
+      "name": "Webhook Bug",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        16
+      ],
+      "webhookId": "c485c2d1-f360-429f-9226-7849cc6c4530"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.query.priority }}",
+              "value2": "high"
+            }
+          ]
+        }
+      },
+      "id": "9f4118ee-5eb9-4bfb-bdc7-de8e63953a53",
+      "name": "É Crítico?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        16,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://webhook.site/e5f0125a-aa3c-4532-898e-d12cc9660627",
+        "options": {}
+      },
+      "id": "a5853f42-10ac-4129-8fad-bdfc1a12eb68",
+      "name": "Notificar Time",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -96
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Bug": {
+      "main": [
+        [
+          {
+            "node": "É Crítico?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "É Crítico?": {
+      "main": [
+        [
+          {
+            "node": "Notificar Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "62ad75b725280d814dbc1a571eb608ba1883b5068700c857f8dd52cade4cd305"
+  }
+}
