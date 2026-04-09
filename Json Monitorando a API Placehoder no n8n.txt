@@ -1,0 +1,209 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -400,
+        -192
+      ],
+      "id": "8cbdb5b2-7ff8-42fc-95f0-7b8819c7c87d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/posts/1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -256,
+        -48
+      ],
+      "id": "27334dc2-37ba-4720-b02c-731bc358de2a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ef9d2d53-cedf-47d0-9026-52effdd28783",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "7661d6a8-96cc-4394-bc6d-ee8acef0635d",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -112,
+        -48
+      ],
+      "id": "cf89d2c7-2329-4fe8-bc80-ecc684e43ffa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b259379e-3f8b-42d9-af34-4c4ec4a90d88",
+              "name": "status_da_api",
+              "value": "API ONLINE E OPERANTE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        -144
+      ],
+      "id": "8fce02cc-1eb4-446a-bf28-08e30efefc1d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3442a1b-694c-41ac-af4f-5681f235c6c9",
+              "name": "mensagem_de_alerta",
+              "value": "ERRO: API COM PROBLEMA",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        48
+      ],
+      "id": "e6654de2-aa42-4aba-99f0-ebb1793f8bba",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "wirus1@gmail.com",
+        "toEmail": "wirus1@gmail.com",
+        "subject": "Alerta erro de API",
+        "html": "Ocorreu um erro de ID na API agora",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        48
+      ],
+      "id": "6445e124-77c7-46b3-a108-03add2da4516",
+      "name": "Send an Email",
+      "webhookId": "86345cf8-10f2-46df-9861-7811204dfe6f",
+      "credentials": {
+        "smtp": {
+          "id": "wDHKmfSfqrVO0Ug3",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62ad75b725280d814dbc1a571eb608ba1883b5068700c857f8dd52cade4cd305"
+  }
+}
