@@ -1,0 +1,203 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -672,
+        -48
+      ],
+      "id": "b424ad25-7cb9-4f0a-8d4f-0ace7380c1cd",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sml4lsmkjV5dRIGr",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c0e5b5a4-d974-4a17-8e49-d012ee3753ac",
+              "leftValue": "={{ $json.from.value[0].address }}",
+              "rightValue": "hashtag.com",
+              "operator": {
+                "type": "string",
+                "operation": "notContains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        -48
+      ],
+      "id": "9af70ec8-307a-41c5-8058-0d969ff4378c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=chatHistory",
+        "options": {
+          "systemMessage": "\"Você é a Simone (Si). Sua única tarefa é gerar o corpo de um e-mail de resposta.\n\nCONTEÚDO DA RESPOSTA: Olá!\n\nAgradeço o contato e o interesse no meu perfil para a vaga de QA. Já estou analisando os detalhes da oportunidade que você compartilhou e, em breve, retorno com um posicionamento.\n\nSobre a pretensão salarial, prefiro abordar esse tema em um momento mais oportuno, após entendermos melhor os desafios da posição.\n\nAtenciosamente, Simone (Si)\n\nREGRAS GERAIS:\n\nNÃO use colchetes ou campos para preencher.\n\nNÃO escreva 'Entendido' ou qualquer outra frase de introdução.\n\nNÃO assine como assistente.\n\nRetorne APENAS o texto acima, exatamente como está escrito.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -256,
+        -144
+      ],
+      "id": "67f1e6f5-bf94-4fd0-8f84-69966d186f6b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        80
+      ],
+      "id": "b998e4e1-cfe8-481a-b7ea-1bbefb2ab4b0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ZQ25a6nt90Ea2uW6",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=chatHistory",
+        "contextWindowLength": 25
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        96
+      ],
+      "id": "72b6779f-39f5-45e5-a44f-eb9a11818033",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "message": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        -144
+      ],
+      "id": "f45185c1-34a3-43ec-9872-23e6cfed6e5a",
+      "name": "Reply to a message",
+      "webhookId": "3381bd9e-949f-4992-91eb-354fb0690552",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sml4lsmkjV5dRIGr",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "62ad75b725280d814dbc1a571eb608ba1883b5068700c857f8dd52cade4cd305"
+  }
+}
